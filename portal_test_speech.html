@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>In Reach — TEST: Speech Clinician (Behind on Hours)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --t50:#e8f7f3;--t100:#c2eadf;--t200:#87d5be;
+  --t400:#2db896;--t500:#1aa382;--t600:#138e70;
+  --t700:#0d7a5e;--t800:#085e48;--t900:#04422f;
+  --s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;
+  --s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;
+  --s600:#475569;--s700:#334155;--s800:#1e293b;--s900:#0f172a;
+  --a100:#fef3c7;--a400:#fbbf24;--a600:#d97706;--a800:#92400e;
+  --g100:#fdf8e1;--g400:#f0c040;--g600:#b8860b;--g800:#7a5900;
+  --r100:#ffe4e6;--r500:#f43f5e;--r600:#e11d48;
+  --gr100:#dcfce7;--gr600:#16a34a;--gr800:#166534;
+  --b100:#dbeafe;--b600:#2563eb;--b800:#1e3a8a;
+  --p100:#ede9fe;--p600:#7c3aed;--p800:#4c1d95;
+  --white:#fff;
+  --fd:'Fraunces',serif;--fb:'DM Sans',sans-serif;
+  --rsm:8px;--rmd:12px;--rlg:18px;--rxl:24px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--fb);background:#eef2f7;color:var(--s800);font-size:14px;line-height:1.6;min-height:100vh;}
+.site-header{background:linear-gradient(130deg,var(--t900),var(--t700) 50%,var(--t500) 100%);position:relative;overflow:hidden;}
+.site-header::before{content:'';position:absolute;top:-60px;right:-40px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.04);}
+.hdr{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:16px 28px;position:relative;z-index:1;}
+.hdr-icon{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;}
+.hdr-icon svg{width:18px;height:18px;}
+.hdr-title{font-family:var(--fd);font-size:17px;color:#fff;font-weight:400;margin-left:8px;}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px;margin-left:8px;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:9px;}
+.user-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 11px 5px 5px;}
+.uc-av{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;}
+.uc-name{font-size:12px;color:rgba(255,255,255,.9);font-weight:500;}
+.uc-role{font-size:10px;color:rgba(255,255,255,.5);}
+.upd-pill{font-size:11px;color:rgba(255,255,255,.45);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:3px 9px;}
+.site-nav{background:var(--white);border-bottom:1px solid var(--s200);position:sticky;top:0;z-index:200;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.nav-inner{max-width:1180px;margin:0 auto;padding:0 28px;display:flex;overflow-x:auto;scrollbar-width:none;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-btn{padding:12px 14px;font-size:13px;font-weight:500;color:var(--s500);cursor:pointer;white-space:nowrap;border-bottom:2.5px solid transparent;border-top:none;border-left:none;border-right:none;background:none;display:flex;align-items:center;gap:5px;transition:color .18s,border-color .18s;}
+.nav-btn:hover{color:var(--t700);}
+.nav-btn.active{color:var(--t700);border-bottom-color:var(--t600);}
+.main{max-width:1180px;margin:0 auto;padding:22px 28px 60px;}
+.view{display:none;}
+.view.active{display:block;}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;gap:12px;}
+.spinner{width:28px;height:28px;border-radius:50%;border:3px solid var(--t100);border-top-color:var(--t600);animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading p{font-size:13px;color:var(--s400);}
+.error-box{background:var(--r100);border:1px solid #fecdd3;border-radius:var(--rlg);padding:18px 22px;font-size:13px;color:var(--r600);margin-bottom:16px;}
+.hero-card{background:var(--white);border-radius:var(--rxl);border:1px solid var(--s200);padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.av{width:54px;height:54px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--t400),var(--t800));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:18px;color:#fff;font-weight:300;}
+.hero-info h2{font-family:var(--fd);font-size:20px;font-weight:400;color:var(--s800);}
+.badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;}
+.bt{background:var(--t50);color:var(--t800);border:1px solid var(--t100);}
+.ba{background:var(--a100);color:var(--a800);border:1px solid #fde68a;}
+.bb{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;}
+.bg{background:var(--g100);color:var(--g800);border:1px solid #ede9b0;}
+.hero-meta{margin-left:auto;text-align:right;}
+.hero-meta .upd{font-size:11px;color:var(--s400);}
+.hero-meta .wks{font-family:var(--fd);font-size:26px;color:var(--t700);line-height:1;}
+.hero-meta .wks-lbl{font-size:11px;color:var(--s400);margin-top:2px;}
+.vc{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.vtog{display:flex;background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:3px;gap:2px;}
+.vb{font-family:var(--fb);font-size:12px;font-weight:500;padding:6px 13px;border-radius:9px;cursor:pointer;border:none;background:transparent;color:var(--s500);transition:all .15s;}
+.vb.active{background:var(--t600);color:#fff;}
+.psel{font-family:var(--fb);font-size:12px;font-weight:500;color:var(--s700);background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:6px 26px 6px 11px;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%2364748b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;}
+.csel{font-family:var(--fb);font-size:12px;font-weight:500;color:var(--s700);background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:6px 26px 6px 11px;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%2364748b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;}
+.vc-note{font-size:12px;color:var(--s400);margin-left:auto;}
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:11px;margin-bottom:16px;}
+.mc{background:var(--white);border-radius:var(--rlg);padding:14px 16px;border:1px solid var(--s200);box-shadow:0 1px 3px rgba(0,0,0,.04);transition:transform .15s,box-shadow .15s;}
+.mc:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.mc.ac-t{background:linear-gradient(135deg,var(--t800),var(--t600));border-color:transparent;}
+.mc.ac-t .ml,.mc.ac-t .ms{color:rgba(255,255,255,.6);}
+.mc.ac-t .mv{color:#fff;}
+.mc.ac-g{background:linear-gradient(135deg,var(--g800),var(--a600));border-color:transparent;}
+.mc.ac-g .ml,.mc.ac-g .ms{color:rgba(255,255,255,.6);}
+.mc.ac-g .mv{color:#fff;}
+.mc.lt{border-left:3px solid var(--t500);}
+.mc.la{border-left:3px solid var(--a400);}
+.mc.lr{border-left:3px solid var(--r500);}
+.ml{font-size:10px;font-weight:600;color:var(--s400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+.mv{font-family:var(--fd);font-size:26px;color:var(--s800);line-height:1;font-weight:300;}
+.ms{font-size:11px;color:var(--s400);margin-top:3px;}
+.vpos{color:var(--gr600);}
+.vneg{color:var(--r600);}
+.vzero{color:var(--s400);}
+.prog-card{background:var(--white);border-radius:var(--rlg);border:1px solid var(--s200);padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.ph h3{font-size:14px;font-weight:600;color:var(--s700);}
+.ph p{font-size:11px;color:var(--s400);margin-top:2px;}
+.pct-big{font-family:var(--fd);font-size:28px;color:var(--t700);font-weight:300;line-height:1;text-align:right;}
+.pct-lbl{font-size:11px;color:var(--s400);text-align:right;margin-top:2px;}
+.track{width:100%;height:11px;background:var(--s100);border-radius:20px;overflow:hidden;margin-bottom:7px;}
+.tf{height:100%;border-radius:20px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+.tf-good{background:linear-gradient(90deg,var(--t400),var(--t600));}
+.tf-warn{background:linear-gradient(90deg,var(--a400),var(--a600));}
+.tf-danger{background:linear-gradient(90deg,#fb923c,var(--r500));}
+.track-marks{display:flex;justify-content:space-between;font-size:10px;color:var(--s400);}
+.tier-chips{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
+.tc{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;}
+.tc .td{width:7px;height:7px;border-radius:50%;}
+.tc-gold{background:var(--g100);color:var(--g800);}
+.tc-gold .td{background:var(--g600);}
+.tc-teal{background:var(--t50);color:var(--t800);}
+.tc-teal .td{background:var(--t500);}
+.tc-gray{background:var(--s100);color:var(--s600);}
+.tc-gray .td{background:var(--s400);}
+.bonus-card{background:var(--white);border-radius:var(--rlg);border:1px solid var(--s200);padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.bonus-card h3{font-size:14px;font-weight:600;color:var(--s700);margin-bottom:13px;display:flex;align-items:center;gap:6px;}
+.bt-table{width:100%;border-collapse:collapse;font-size:12px;}
+.bt-table thead th{text-align:left;padding:6px 9px;background:var(--s50);color:var(--s500);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;}
+.bt-table thead th:first-child{border-radius:var(--rsm) 0 0 var(--rsm);}
+.bt-table thead th:last-child{border-radius:0 var(--rsm) var(--rsm) 0;}
+.bt-table tbody td{padding:8px 9px;border-bottom:1px solid var(--s100);color:var(--s700);}
+.bt-table tbody tr.tr-t1 td{background:linear-gradient(90deg,#f0fdf8,var(--white));font-weight:600;color:var(--t800);}
+.bt-table tbody tr.tr-t1 td:first-child{border-left:3px solid var(--t500);}
+.bt-table tbody tr.tr-t2 td{background:linear-gradient(90deg,#fefce8,var(--white));font-weight:600;color:var(--g800);}
+.bt-table tbody tr.tr-t2 td:first-child{border-left:3px solid var(--g400);}
+.bonus-est{margin-top:12px;padding:12px 15px;border-radius:var(--rmd);background:linear-gradient(135deg,var(--t50),#f0fdf8);border:1px solid var(--t100);display:flex;align-items:center;justify-content:space-between;}
+.be-lbl{font-size:12px;color:var(--t700);font-weight:500;}
+.be-val{font-family:var(--fd);font-size:24px;color:var(--t800);font-weight:300;}
+.bonus-none{margin-top:12px;padding:12px 15px;border-radius:var(--rmd);background:var(--s50);border:1px solid var(--s200);font-size:12px;color:var(--s500);}
+.scen-card{background:linear-gradient(135deg,var(--s800),var(--s900));border-radius:var(--rlg);padding:20px 22px;margin-bottom:16px;}
+.scen-card h3{font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:13px;}
+.si{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px;}
+.sf label{display:block;font-size:10px;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.sf input{width:100%;font-family:var(--fb);font-size:14px;font-weight:500;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:var(--rsm);padding:8px 10px;outline:none;}
+.sf input:focus{border-color:var(--t400);}
+.sr{background:rgba(255,255,255,.07);border-radius:var(--rmd);padding:13px 15px;border:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.sri{text-align:center;}
+.sri-lbl{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.4px;}
+.sri-val{font-family:var(--fd);font-size:20px;color:#fff;font-weight:300;}
+.dt-card{background:var(--white);border-radius:var(--rlg);border:1px solid var(--s200);padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow-x:auto;}
+.dt-card h3{font-size:14px;font-weight:600;color:var(--s700);margin-bottom:13px;}
+.dt{width:100%;border-collapse:collapse;font-size:12px;min-width:560px;}
+.dt thead th{text-align:right;padding:6px 9px;background:var(--s50);color:var(--s500);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+.dt thead th:first-child{text-align:left;border-radius:var(--rsm) 0 0 var(--rsm);}
+.dt thead th:last-child{border-radius:0 var(--rsm) var(--rsm) 0;}
+.dt tbody td{padding:7px 9px;border-bottom:1px solid var(--s100);text-align:right;color:var(--s700);}
+.dt tbody td:first-child{text-align:left;font-weight:500;color:var(--s800);}
+.dt tbody tr:hover td{background:var(--s50);}
+.dt tfoot td{padding:8px 9px;text-align:right;font-weight:600;border-top:2px solid var(--s200);color:var(--s800);background:var(--s50);}
+.dt tfoot td:first-child{text-align:left;border-radius:var(--rsm) 0 0 var(--rsm);}
+.dt tfoot td:last-child{border-radius:0 var(--rsm) var(--rsm) 0;}
+.team-card{background:var(--white);border-radius:var(--rlg);border:1px solid var(--s200);padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow-x:auto;}
+.team-card h3{font-size:14px;font-weight:600;color:var(--s700);margin-bottom:13px;display:flex;align-items:center;gap:6px;}
+.tt{width:100%;border-collapse:collapse;font-size:12px;min-width:700px;}
+.tt thead th{text-align:left;padding:6px 10px;background:var(--s50);color:var(--s500);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+.tt thead th:first-child{border-radius:var(--rsm) 0 0 var(--rsm);}
+.tt thead th:last-child{border-radius:0 var(--rsm) var(--rsm) 0;}
+.tt tbody td{padding:9px 10px;border-bottom:1px solid var(--s100);color:var(--s700);vertical-align:middle;}
+.tt tbody tr:hover td{background:var(--s50);}
+.tt tbody tr:last-child td{border-bottom:none;}
+.tt-name{font-weight:600;color:var(--s800);}
+.pp{display:inline-block;padding:3px 8px;border-radius:11px;font-size:11px;font-weight:600;}
+.pp-good{background:var(--gr100);color:var(--gr800);}
+.pp-warn{background:var(--a100);color:var(--a800);}
+.pp-danger{background:var(--r100);color:var(--r600);}
+.pp-na{background:var(--s100);color:var(--s500);}
+.mb{width:70px;height:6px;background:var(--s100);border-radius:10px;overflow:hidden;display:inline-block;vertical-align:middle;}
+.mbf{height:100%;border-radius:10px;}
+.mbf-g{background:var(--t400);}
+.mbf-w{background:var(--a400);}
+.mbf-d{background:var(--r500);}
+.lvl{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:11px;}
+.lvl-lead{background:var(--a100);color:var(--a800);}
+.lvl-coast{background:var(--t50);color:var(--t800);}
+.lvl-will{background:var(--b100);color:var(--b800);}
+.lvl-clack{background:var(--p100);color:var(--p600);}
+.lvl-hood{background:var(--r100);color:var(--r600);}
+.lvl-other{background:var(--s100);color:var(--s600);}
+.lb-card{background:linear-gradient(135deg,var(--s800),var(--s700));border-radius:var(--rlg);padding:20px 22px;margin-bottom:16px;color:#fff;}
+.lb-card h3{font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:13px;}
+.lb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:11px;}
+.lbi{background:rgba(255,255,255,.07);border-radius:var(--rmd);padding:13px 15px;border:1px solid rgba(255,255,255,.1);}
+.lbi-lbl{font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.lbi-val{font-family:var(--fd);font-size:20px;color:#fff;font-weight:300;}
+.lbi-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:3px;}
+.lb-yes{color:#4ade80;font-weight:600;}
+.lb-no{color:#f87171;font-weight:600;}
+.sec-hdr{margin-bottom:18px;}
+.sec-hdr h2{font-family:var(--fd);font-size:21px;font-weight:400;color:var(--s800);}
+.sec-hdr p{font-size:13px;color:var(--s500);margin-top:3px;}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:13px;}
+.res-card{background:var(--white);border-radius:var(--rlg);border:1px solid var(--s200);padding:17px 19px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:transform .15s,box-shadow .15s;}
+.res-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.res-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ri-t{background:var(--t50);}
+.ri-a{background:var(--a100);}
+.ri-b{background:var(--b100);}
+.ri-r{background:var(--r100);}
+.res-card h4{font-size:13px;font-weight:600;color:var(--s800);}
+.res-card p{font-size:12px;color:var(--s500);line-height:1.5;}
+.res-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--t700);text-decoration:none;margin-top:auto;padding:6px 11px;border-radius:var(--rsm);background:var(--t50);border:1px solid var(--t100);transition:background .15s;}
+.res-link:hover{background:var(--t100);}
+.res-link-a{background:var(--a100);border-color:#fde68a;color:var(--a800);}
+.res-link-b{background:#eff6ff;border-color:#bfdbfe;color:#1e40af;}
+.info-card{background:var(--white);border-radius:var(--rlg);border:1px solid var(--s200);padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.info-card h3{font-size:14px;font-weight:600;color:var(--s700);margin-bottom:12px;}
+.notice{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--rmd);padding:11px 13px;margin-bottom:13px;font-size:12px;color:var(--a800);line-height:1.6;}
+.info-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.info-list li{font-size:13px;color:var(--s600);padding-left:16px;position:relative;line-height:1.6;}
+.info-list li::before{content:'•';position:absolute;left:0;color:var(--t500);}
+.info-list li strong{color:var(--s800);}
+.hl-t{color:var(--t600);font-weight:500;}
+.hl-a{color:var(--a600);font-weight:500;}
+@media(max-width:640px){.main{padding:14px;}.hdr{padding:14px;}.hero-card{flex-direction:column;align-items:flex-start;}.hero-meta{text-align:left;}.si{grid-template-columns:1fr;}}
+
+/* ── ALERT CARD ── */
+.alert-card{background:var(--white);border-radius:var(--rlg);border:1.5px solid var(--a400);padding:20px 22px;margin-bottom:16px;box-shadow:0 2px 8px rgba(251,191,36,.15);}
+.alert-card.danger{border-color:var(--r500);box-shadow:0 2px 8px rgba(244,63,94,.12);}
+.alert-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.alert-icon{font-size:22px;}
+.alert-title{font-size:15px;font-weight:600;color:var(--s800);}
+.alert-sub{font-size:12px;color:var(--s500);margin-top:2px;}
+.alert-stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;padding:12px 14px;background:var(--s50);border-radius:var(--rmd);}
+.alert-stat{text-align:center;}
+.alert-stat-val{font-family:var(--fd);font-size:18px;color:var(--s800);font-weight:300;}
+.alert-stat-lbl{font-size:10px;color:var(--s400);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+.alert-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.alert-btn-pto{display:flex;align-items:center;gap:6px;padding:9px 16px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:var(--rmd);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;}
+.alert-btn-pto:hover{background:#dbeafe;}
+.alert-btn-help{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--r100);border:1px solid #fecdd3;color:var(--r600);border-radius:var(--rmd);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;}
+.alert-btn-help:hover{background:#fecdd3;}
+.alert-details{display:none;margin-top:4px;}
+.alert-details.open{display:block;}
+.alert-details textarea{width:100%;font-family:var(--fb);font-size:13px;color:var(--s800);background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:10px 12px;outline:none;resize:vertical;min-height:80px;line-height:1.5;}
+.alert-details textarea:focus{border-color:var(--t500);}
+.alert-details textarea::placeholder{color:var(--s400);}
+.alert-send-btn{margin-top:8px;padding:9px 18px;background:linear-gradient(135deg,var(--t700),var(--t500));color:#fff;border:none;border-radius:var(--rmd);font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s;}
+.alert-send-btn:hover{opacity:.9;}
+.alert-send-btn:disabled{opacity:.4;cursor:default;}
+.alert-sent{margin-top:8px;padding:9px 14px;background:var(--t50);border:1px solid var(--t100);border-radius:var(--rmd);font-size:12px;color:var(--t800);display:none;}
+.alert-sent.show{display:block;}
+</style>
+</head>
+<body>
+
+<div style="background:#fbbf24;color:#92400e;text-align:center;padding:8px;font-size:13px;font-weight:600;">⚠️ TEST PAGE — Demo showing Speech clinician behind on hours. Slack messages will still send.</div>
+<header class="site-header">
+  <div class="hdr">
+    <div class="hdr-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linecap="round">
+        <path d="M3 18l4-8 4 4 4-6 4 10"/><circle cx="19" cy="6" r="2" fill="rgba(255,255,255,.4)" stroke="none"/>
+      </svg>
+    </div>
+    <div><div class="hdr-title">In Reach Therapy</div><div class="hdr-sub">Clinician Stats Portal</div></div>
+    <div class="hdr-right">
+      <div class="upd-pill" id="updPill">Loading…</div>
+      <div class="user-chip">
+        <div class="uc-av">BL</div>
+        <div><div class="uc-name">Bethany Laratta</div><div class="uc-role">SLP — Willamette</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="site-nav">
+  <div class="nav-inner">
+    <button class="nav-btn" data-tab="my-stats" onclick="switchTab('my-stats')">📊 My Stats</button><button class="nav-btn" data-tab="resources" onclick="switchTab('resources')">📚 Resources</button><button class="nav-btn" data-tab="how-it-works" onclick="switchTab('how-it-works')">💡 How It Works</button>
+  </div>
+</nav>
+<main class="main">
+  <div class="view active" id="view-my-stats">
+    
+<div class="vc">
+  <div class="vtog">
+    <button class="vb active" onclick="setView('quarter',this)">Quarter</button>
+    <button class="vb" onclick="setView('month',this)">Month</button>
+    <button class="vb" onclick="setView('week',this)">Week</button>
+  </div>
+  <select class="psel" onchange="setPeriod(this.value)">
+    <option value="Q1 2026" selected>Q1 2026 (Jan–Mar)</option><option value="Q4 2025" >Q4 2025 (Oct–Dec)</option><option value="Q3 2025" >Q3 2025 (Jul–Sep)</option>
+  </select>
+  
+  <span class="vc-note">📡 Live from Google Sheets</span>
+</div>
+    <div id="myStatsArea"><div class="loading"><div class="spinner"></div><p>Loading your stats…</p></div></div>
+  </div>
+  <div class="view" id="view-resources">
+    
+<div class="sec-hdr"><h2>Resources &amp; Documents</h2><p>Handbooks, pay guides, and tools</p></div>
+<div class="res-grid">
+  <div class="res-card"><div class="res-icon ri-t">📖</div><h4>Employee Handbook</h4><p>Policies, procedures, and expectations for all team members.</p><a href="#" class="res-link">Open Handbook ↗</a></div>
+  <div class="res-card"><div class="res-icon ri-a">💰</div><h4>Pay Structure Guide</h4><p>FairShare tracks, salary levels, and compensation guide.</p><a href="#" class="res-link res-link-a">View Pay Guide ↗</a></div>
+  <div class="res-card"><div class="res-icon ri-b">📋</div><h4>FairShare Initiative</h4><p>Coastal, River, and Mountain tracks explained with PTO details.</p><a href="#" class="res-link res-link-b">View FairShare ↗</a></div>
+  <div class="res-card"><div class="res-icon ri-t">⏱️</div><h4>Caseload Tracker</h4><p>Track your recurring caseload and expected hours.</p><a href="#" class="res-link">Open Tracker ↗</a></div>
+  <div class="res-card"><div class="res-icon ri-r">📝</div><h4>Note Review Template</h4><p>Clinical documentation review guide and template.</p><a href="#" class="res-link" style="background:var(--r100);border-color:#fecdd3;color:#be185d;">Open Template ↗</a></div>
+  <div class="res-card"><div class="res-icon ri-a">📊</div><h4>Coastal Comparison Form</h4><p>Compare your level against Coastal track expectations.</p><a href="https://form.jotform.com/251213054" class="res-link res-link-a" target="_blank">Open Form ↗</a></div>
+</div>
+  </div>
+  <div class="view" id="view-how-it-works">
+    
+<div class="info-card">
+  <h3>📌 How does this tracking system work?</h3>
+  <div class="notice">⚠️ Stats are calculated weekly from IntakeQ data by your Lead. Do not edit these fields directly.</div>
+  <ul class="info-list">
+    <li><strong>QCompleted:</strong> Billable hours <span class="hl-t">including all credits</span> as of the most recent weekly update.</li>
+    <li><strong>Client Hours:</strong> Treatment + evaluation only — <span class="hl-a">used for bonus eligibility</span>. PTO and holidays do NOT count.</li>
+    <li><strong>QCHE Formula:</strong> (52 − weeks of leave) × weekly hrs ÷ 4 = quarterly 100% target</li>
+    <li><strong>Quarterly Expectations:</strong> Weekly hrs × 13 weeks. Met via billable hours + PTO/holiday credits.</li>
+    <li><strong>Bare Minimum:</strong> 96% of QCHE must be met to remain at your current level.</li>
+    <li><strong>Holiday credits</strong> = Weekly expectation ÷ 5</li>
+  </ul>
+</div>
+<div class="info-card">
+  <h3>📈 Bonus Structure</h3>
+  <ul class="info-list">
+    <li><strong>Tier 1 (1–10 hrs over QCHE):</strong> <span class="hl-t">$30 per client hour</span> for the first 10 hours above 100% QCHE. Max $300.</li>
+    <li><strong>Tier 2 (11+ hrs over QCHE):</strong> <span class="hl-a">$50 per client hour</span> for every hour beyond the first 10 — no upper limit!</li>
+    <li>Bonuses stack — first 10 hrs over QCHE earn $30/hr ($300), then $50/hr for every additional hour.</li>
+    <li>Use the <strong>Projection Scenario</strong> calculator on your Stats page to model outcomes.</li>
+  </ul>
+</div>
+<div class="info-card">
+  <h3>🔄 Changing Your Pay Track</h3>
+  <ul class="info-list">
+    <li>You may change your pay track <strong>once per quarter</strong>, before the quarter starts.</li>
+    <li>Contact your Lead to request a track change for the upcoming quarter.</li>
+  </ul>
+</div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const WEB_APP_URL = "DEMO_ONLY"; // Test page — forced demo mode
+const SLACK_URL = "https://script.google.com/macros/s/AKfycbw56m7oEFg6VX2EZ7rHxl4cKaV-3Pte55BM3BpGeuLwMOHkWAs6tq8J5_h2eXz3mvbtOA/exec"; // Real URL for Slack alerts only
+let summaryData = [];
+let clinicianDetails = {};
+let chartInst = null;
+let currentView = 'quarter';
+let currentPeriod = 'Q1 2026';
+const QUARTERS = ['Q1 2026','Q4 2025','Q3 2025'];
+const QLABELS = {'Q1 2026':'Q1 2026 (Jan–Mar)','Q4 2025':'Q4 2025 (Oct–Dec)','Q3 2025':'Q3 2025 (Jul–Sep)'};
+
+async function loadData(quarterOverride) {
+  try {
+    const {quarter, year} = quarterOverride ? pq(quarterOverride) : pq(currentPeriod);
+    if (WEB_APP_URL.includes("YOUR_APPS") || WEB_APP_URL.includes("DEMO_ONLY")) {
+      summaryData = DEMO_DATA.filter(c => ALLOWED_CLINICIANS.includes(c.name));
+      document.getElementById('updPill').textContent = 'Demo mode';
+    } else {
+      const url = WEB_APP_URL + '?action=summary&quarter=' + quarter + '&year=' + year;
+      document.getElementById('updPill').textContent = 'Loading...';
+      // 15 second timeout to handle Apps Script cold starts
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      try {
+        const res = await fetch(url, {signal: controller.signal});
+        clearTimeout(timeout);
+        const json = await res.json();
+        const all = json.clinicians || [];
+        summaryData = ALLOWED_CLINICIANS[0] === '__ALL__'
+          ? all
+          : all.filter(c => ALLOWED_CLINICIANS.includes(c.name));
+        document.getElementById('updPill').textContent = 'Live ✓ ' + quarter + ' ' + year;
+      } catch(fetchErr) {
+        clearTimeout(timeout);
+        throw fetchErr;
+      }
+    }
+    onDataLoaded();
+  } catch(e) {
+    console.warn('loadData error:', e.message);
+    summaryData = DEMO_DATA.filter(c => ALLOWED_CLINICIANS.includes(c.name));
+    document.getElementById('updPill').textContent = 'Offline — showing demo';
+    onDataLoaded();
+  }
+}
+
+async function loadDetail(name, quarter, year) {
+  // TEST PAGE — return fake weekly data showing missed targets
+  if (name === 'Bethany Laratta') {
+    return { weekly: [
+      {week_start:'01/06/2026',week_end:'01/12/2026',client_hours:22,pto_hours:0,holiday_hours:0,expected_hours:24,total_with_credits:22},
+      {week_start:'01/13/2026',week_end:'01/19/2026',client_hours:20,pto_hours:0,holiday_hours:0,expected_hours:24,total_with_credits:20},
+      {week_start:'01/20/2026',week_end:'01/26/2026',client_hours:10,pto_hours:0,holiday_hours:0,expected_hours:24,total_with_credits:10},
+      {week_start:'01/27/2026',week_end:'02/02/2026',client_hours:8,pto_hours:0,holiday_hours:0,expected_hours:24,total_with_credits:8},
+      {week_start:'02/03/2026',week_end:'02/09/2026',client_hours:7,pto_hours:0,holiday_hours:0,expected_hours:24,total_with_credits:7},
+      {week_start:'02/10/2026',week_end:'02/16/2026',client_hours:5,pto_hours:0,holiday_hours:0,expected_hours:24,total_with_credits:5},
+    ]};
+  }
+  const key = name+'_'+quarter+'_'+year;
+  if (clinicianDetails[key]) return clinicianDetails[key];
+  // In demo/test mode return fake weekly data
+  if (WEB_APP_URL.includes("DEMO_ONLY")) {
+    return { weekly: [
+      {week_start:'01/06/2026',week_end:'01/12/2026',client_hours:18,pto_hours:0,holiday_hours:0,expected_hours:parseFloat(window._cs?.weekly_hrs_exp)||20,total_with_credits:18},
+      {week_start:'01/13/2026',week_end:'01/19/2026',client_hours:15,pto_hours:0,holiday_hours:0,expected_hours:parseFloat(window._cs?.weekly_hrs_exp)||20,total_with_credits:15},
+      {week_start:'01/20/2026',week_end:'01/26/2026',client_hours:12,pto_hours:0,holiday_hours:0,expected_hours:parseFloat(window._cs?.weekly_hrs_exp)||20,total_with_credits:12},
+      {week_start:'01/27/2026',week_end:'02/02/2026',client_hours:10,pto_hours:0,holiday_hours:0,expected_hours:parseFloat(window._cs?.weekly_hrs_exp)||20,total_with_credits:10},
+      {week_start:'02/03/2026',week_end:'02/09/2026',client_hours:9,pto_hours:0,holiday_hours:0,expected_hours:parseFloat(window._cs?.weekly_hrs_exp)||20,total_with_credits:9},
+      {week_start:'02/10/2026',week_end:'02/16/2026',client_hours:8,pto_hours:0,holiday_hours:0,expected_hours:parseFloat(window._cs?.weekly_hrs_exp)||20,total_with_credits:8},
+    ]};
+  }
+  if (WEB_APP_URL.includes("YOUR_APPS")) return null;
+  try {
+    const res = await fetch(WEB_APP_URL+'?action=clinician&name='+encodeURIComponent(name)+'&quarter='+quarter+'&year='+year);
+    clinicianDetails[key] = await res.json();
+    return clinicianDetails[key];
+  } catch(e) { return null; }
+}
+
+function pq(p) { const s=p.split(' '); return {quarter:s[0],year:parseInt(s[1])}; }
+function fmt(n,d=2){ return parseFloat((n||0).toFixed(d)); }
+function vf(v){ v=fmt(v); return v>0?'<span class="vpos">+'+v+'</span>':v<0?'<span class="vneg">'+v+'</span>':'<span class="vzero">0</span>'; }
+function nf(v){ v=fmt(v); return v>0?v:'<span class="vzero">0</span>'; }
+function lvlClass(l){ if(!l)return'lvl-other'; l=l.toLowerCase(); if(l.includes('lead'))return'lvl-lead'; if(l.includes('coastal'))return'lvl-coast'; if(l.includes('willamette'))return'lvl-will'; if(l.includes('clackamas'))return'lvl-clack'; if(l.includes('hood'))return'lvl-hood'; return'lvl-other'; }
+
+function buildStatsHTML(cData, viewingName) {
+  if (!cData) return '<div class="error-box">No data found. Make sure the Apps Script has run successfully.</div>';
+  const ch = fmt(cData.client_hours);
+  const qche = fmt(cData.qche_100);
+  const qchePct = qche>0 ? fmt((ch/qche)*100) : 0;
+  const qcompleted = fmt(cData.qcompleted);
+  const weeklyExp = fmt(cData.weekly_hrs_exp);
+  const qExp = weeklyExp*13;
+  const qRem = fmt(qcompleted - qExp);
+  const creditTotal = fmt(qcompleted - ch);
+  const minExp = Math.round(qche*0.96);
+  const hrsOver = fmt(ch - qche);
+  const isT2 = hrsOver > 10;
+  const isT1 = hrsOver > 0 && hrsOver <= 10;
+  let bonusHTML = '';
+  if(isT2){
+    const t2h = fmt(hrsOver-10);
+    const total = (10*30)+(t2h*50);
+    bonusHTML=`<div class="bonus-est"><div class="be-lbl">🏆 Tier 1 + Tier 2 Bonus<br><small style="color:var(--t600);font-weight:400;">10 hrs×$30 + ${t2h} hrs×$50</small></div><div class="be-val">$${total.toLocaleString()}</div></div>`;
+  } else if(isT1){
+    bonusHTML=`<div class="bonus-est"><div class="be-lbl">⭐ Tier 1 Bonus<br><small style="color:var(--t600);font-weight:400;">${hrsOver} hrs × $30</small></div><div class="be-val">$${fmt(hrsOver*30).toLocaleString()}</div></div>`;
+  } else {
+    const needed=fmt(qche-ch);
+    bonusHTML=`<div class="bonus-none">ℹ️ <strong>${needed > 0 ? needed+' more client hours' : 'Hit your QCHE!'}</strong> ${needed > 0 ? 'needed to reach 100% QCHE and start earning bonus' : ''}</div>`;
+  }
+  return `
+    <div id="alertCardWrap">
+      <div class="alert-card danger" id="alertCard">
+        <div class="alert-header">
+          <span class="alert-icon">🔴</span>
+          <div>
+            <div class="alert-title">Falling behind — your lead can help</div>
+            <div class="alert-sub">📉 Last week you were 16 hrs below your 24 hr weekly target. Your 4-week average is also below target.</div>
+          </div>
+        </div>
+        <div class="alert-stats">
+          <div class="alert-stat"><div class="alert-stat-val">72</div><div class="alert-stat-lbl">Client Hrs</div></div>
+          <div class="alert-stat"><div class="alert-stat-val">27.4%</div><div class="alert-stat-lbl">QCHE %</div></div>
+          <div class="alert-stat"><div class="alert-stat-val">10</div><div class="alert-stat-lbl">Wks Left</div></div>
+          <div class="alert-stat"><div class="alert-stat-val">24</div><div class="alert-stat-lbl">Wkly Target</div></div>
+        </div>
+        <div class="alert-btns">
+          <button class="alert-btn-pto" onclick="sendPTOAlert('Q2 2026','weekly',72,27.4,10,24)">
+            📅 I'm planning PTO
+          </button>
+          <button class="alert-btn-help" onclick="toggleHelpForm()">
+            🙋 I need help
+          </button>
+        </div>
+        <div class="alert-details" id="helpForm">
+          <textarea id="helpDetails" placeholder="Tell your lead what's going on — e.g. I had a lot of cancellations this week and I'm not sure how to catch up. Can we talk through my schedule?"></textarea>
+          <button class="alert-send-btn" id="helpSendBtn" onclick="sendHelpAlert('Q2 2026','weekly',72,27.4,10,24)">
+            Send to Claire &amp; HR →
+          </button>
+        </div>
+        <div class="alert-sent" id="alertSent"></div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="av">${viewingName.split(' ').map(n=>n[0]).join('')}</div>
+      <div class="hero-info">
+        <h2>${viewingName} — Stats</h2>
+        <div class="badges">
+          <span class="badge ba">${cData.current_quarter||'Q1'} ${cData.year||2026}</span>
+          <span class="badge bt">${cData.discipline||'—'}</span>
+          <span class="badge bg">${cData.level||'—'}</span>
+          <span class="badge bb">${weeklyExp} hrs/wk expected</span>
+        </div>
+      </div>
+      <div class="hero-meta">
+        <div class="upd">Last updated: ${cData.last_updated||'—'}</div>
+        <div class="wks">${cData.weeks_remaining||0}</div>
+        <div class="wks-lbl">weeks remaining in quarter</div>
+      </div>
+    </div>
+    <div class="mg">
+      <div class="mc ac-t"><div class="ml">QCompleted w/ Credits</div><div class="mv">${qcompleted}</div><div class="ms">Billable hrs this quarter</div></div>
+      <div class="mc lt"><div class="ml">Client Hours</div><div class="mv">${ch}</div><div class="ms">Treatment + eval only</div></div>
+      <div class="mc ${qchePct>=101?'ac-g':qchePct>=97?'lt':'la'}"><div class="ml">% of QCHE</div><div class="mv">${qchePct.toFixed(1)}%</div><div class="ms">${qchePct>=101?'🏆 Above 100%!':'of '+qche+' target'}</div></div>
+      <div class="mc la"><div class="ml">Quarterly Expectation</div><div class="mv">${qExp}</div><div class="ms">QCHE = ${qche}</div></div>
+      <div class="mc lt"><div class="ml">Credits Applied</div><div class="mv">${creditTotal}</div><div class="ms">PTO + holiday</div></div>
+      <div class="mc ${qRem<0?'lr':'lt'}"><div class="ml">Quarterly Remaining</div><div class="mv ${qRem<0?'vneg':'vpos'}">${qRem>=0?'+':''}${qRem}</div><div class="ms">${qRem<0?'Below':'Above'} expectation</div></div>
+      <div class="mc lt"><div class="ml">Weekly Hrs Exp</div><div class="mv">${weeklyExp}</div><div class="ms">${cData.level||'—'}</div></div>
+      <div class="mc"><div class="ml">Weeks Remaining</div><div class="mv">${cData.weeks_remaining||0}</div><div class="ms">in current quarter</div></div>
+    </div>
+    <div class="prog-card">
+      <div class="ph">
+        <div><h3>Progress toward QCHE</h3><p>Client hours only — PTO/credits don't count for bonus</p></div>
+        <div><div class="pct-big">${qchePct.toFixed(1)}%</div><div class="pct-lbl">${ch} of ${qche} hrs</div></div>
+      </div>
+      <div class="track"><div class="tf ${qchePct>=97?'tf-good':qchePct>=96?'tf-warn':'tf-danger'}" style="width:${Math.min(qchePct,100)}%"></div></div>
+      <div class="track-marks"><span>0</span><span>96% (${minExp})</span><span>1–10 hrs over QCHE</span><span>11+ hrs over 🏆</span></div>
+      <div class="tier-chips">
+        <span class="tc tc-gold"><span class="td"></span>Tier 2: $50/hr (11+ hrs over QCHE)</span>
+        <span class="tc tc-teal"><span class="td"></span>Tier 1: $30/hr (first 10 hrs over QCHE)</span>
+        <span class="tc tc-gray"><span class="td"></span>Min: 96%</span>
+      </div>
+    </div>
+    <div class="bonus-card">
+      <h3>🏆 Bonus Structure &amp; Current Projection</h3>
+      <table class="bt-table">
+        <thead><tr><th>Level</th><th>When</th><th>Hrs Threshold</th><th>Bonus Hrs</th><th>$/Hr</th><th>Total</th></tr></thead>
+        <tbody>
+          <tr class="${isT2?'tr-t2':''}"><td>🏆 TIER 2</td><td>11+ hrs over QCHE</td><td>Over ${qche+10}</td><td>No limit</td><td>$50</td><td>No limit</td></tr>
+          <tr class="${isT1?'tr-t1':''}"><td>⭐ TIER 1</td><td>1–10 hrs over QCHE</td><td>${qche+1}–${qche+10}</td><td>1–10 hrs</td><td>$30</td><td>$30–$300</td></tr>
+          <tr><td>Min Exp</td><td>96%</td><td>${minExp}</td><td>None</td><td>—</td><td>$0</td></tr>
+        </tbody>
+      </table>
+      ${bonusHTML}
+    </div>
+    <div class="scen-card">
+      <h3>🔮 "What if I…" Projection</h3>
+      <div class="si">
+        <div class="sf"><label>Weeks Remaining</label><input type="number" id="scenWks" min="0" max="13" step="1" value="${cData.weeks_remaining||0}" oninput="recalc()"></div>
+        <div class="sf"><label>Avg Client Hrs/Week</label><input type="number" id="scenHpw" min="0" max="40" step="0.5" value="${weeklyExp}" oninput="recalc()"></div>
+      </div>
+      <div class="sr">
+        <div class="sri"><div class="sri-lbl">Projected Total</div><div class="sri-val" id="sTotal">—</div></div>
+        <div class="sri"><div class="sri-lbl">vs QCHE</div><div class="sri-val" id="sVsQ">—</div></div>
+        <div class="sri"><div class="sri-lbl">Projected Bonus</div><div class="sri-val" id="sBonus">—</div></div>
+        <div class="sri"><div class="sri-lbl">Status</div><div class="sri-val" id="sStatus">—</div></div>
+      </div>
+    </div>
+    <div class="dt-card">
+      <h3>📅 <span id="tblHeading">Weekly Detail — ${currentPeriod}</span></h3>
+      <div id="tblWrap"><div class="loading"><div class="spinner"></div><p>Loading weekly data…</p></div></div>
+    </div>
+    <div class="dt-card" id="chartCard" style="display:none;">
+      <h3>Monthly Trend</h3>
+      <div style="position:relative;width:100%;height:200px;"><canvas id="mChart"></canvas></div>
+    </div>`;
+}
+
+function recalc() {
+  const s = window._cs; if(!s) return;
+  const qche=fmt(s.qche_100),ch=fmt(s.client_hours);
+  const wl=parseFloat(document.getElementById('scenWks')?.value)||0;
+  const hpw=parseFloat(document.getElementById('scenHpw')?.value)||0;
+  const proj=fmt(ch+(wl*hpw));
+  const vsQ=fmt(proj-qche);
+  const hrsOver=fmt(proj-qche);
+  let bonus='$0',status='⚠️ Below';
+  if(hrsOver>10){const t2h=fmt(hrsOver-10);bonus='$'+((10*30)+(t2h*50)).toLocaleString();status='🏆 Tier 2';}
+  else if(hrsOver>0){bonus='$'+fmt(hrsOver*30,0).toLocaleString();status='⭐ Tier 1';}
+  else if(proj>=Math.round(qche*0.96)){status='✓ Min Met';}
+  ['sTotal','sVsQ','sBonus','sStatus'].forEach(id=>{if(document.getElementById(id)){}});
+  if(document.getElementById('sTotal'))document.getElementById('sTotal').textContent=proj.toFixed(1);
+  if(document.getElementById('sVsQ'))document.getElementById('sVsQ').textContent=(vsQ>=0?'+':'')+vsQ.toFixed(1);
+  if(document.getElementById('sBonus'))document.getElementById('sBonus').textContent=bonus;
+  if(document.getElementById('sStatus'))document.getElementById('sStatus').textContent=status;
+}
+
+async function buildWeeklyTable(name) {
+  const {quarter,year} = pq(currentPeriod);
+  const detail = await loadDetail(name, quarter, year);
+  let rows = detail?.weekly || [];
+  const wrap = document.getElementById('tblWrap');
+  if(!wrap) return;
+  const heading = document.getElementById('tblHeading');
+  if(currentView==='month'){ rows=aggByMonth(rows); if(heading) heading.textContent='Monthly Breakdown — '+currentPeriod; }
+  else { if(heading) heading.textContent='Weekly Detail — '+currentPeriod; }
+  if(!rows.length){ wrap.innerHTML='<p style="color:var(--s400);text-align:center;padding:20px;">No weekly data yet — run buildWeeklyHistory() in Apps Script.</p>'; return; }
+  // Build alert card now that we have weekly data
+  const alertWrap = document.getElementById('alertCardWrap');
+  if(alertWrap && window._cs) alertWrap.innerHTML = buildAlertCard(window._cs, rows);
+  const tbody = rows.map(r=>`<tr>
+    <td>${r.week_start||r.range||'—'}</td>
+    <td>${vf(fmt(r.total_with_credits))}</td>
+    <td>${fmt(r.client_hours).toFixed(2)}</td>
+    <td>${nf(fmt(r.pto_hours))}</td>
+    <td>${nf(fmt(r.holiday_hours))}</td>
+    <td>${r.expected_hours||0}</td>
+  </tr>`).join('');
+  const s=rows.reduce((a,r)=>({twc:a.twc+fmt(r.total_with_credits),ch:a.ch+fmt(r.client_hours),pto:a.pto+fmt(r.pto_hours),hol:a.hol+fmt(r.holiday_hours),exp:a.exp+fmt(r.expected_hours)}),{twc:0,ch:0,pto:0,hol:0,exp:0});
+  wrap.innerHTML=`<table class="dt">
+    <thead><tr><th>Date Range</th><th>Total w/ Credits</th><th>Client Hrs</th><th>PTO</th><th>Holiday</th><th>Expected</th></tr></thead>
+    <tbody>${tbody}</tbody>
+    <tfoot><tr><td>TOTALS</td><td>${s.twc>=0?'+':''}${s.twc.toFixed(2)}</td><td>${s.ch.toFixed(2)}</td><td>${s.pto.toFixed(2)}</td><td>${s.hol.toFixed(2)}</td><td>${s.exp}</td></tr></tfoot>
+  </table>`;
+  if(currentView==='month'){ document.getElementById('chartCard').style.display='block'; buildChart(rows); }
+  else { if(document.getElementById('chartCard')) document.getElementById('chartCard').style.display='none'; }
+}
+
+function aggByMonth(rows){
+  const m={},o=[];
+  rows.forEach(r=>{
+    let mo='Unknown';
+    try{ mo=new Date(r.week_start).toLocaleString('default',{month:'long'}); }catch(e){}
+    if(!m[mo]){m[mo]={range:mo,total_with_credits:0,client_hours:0,pto_hours:0,holiday_hours:0,expected_hours:0};o.push(mo);}
+    const e=m[mo];
+    e.total_with_credits+=fmt(r.total_with_credits);e.client_hours+=fmt(r.client_hours);
+    e.pto_hours+=fmt(r.pto_hours);e.holiday_hours+=fmt(r.holiday_hours);e.expected_hours+=fmt(r.expected_hours);
+  });
+  return o.map(mo=>({...m[mo],week_start:mo}));
+}
+
+function buildChart(rows){
+  if(chartInst){chartInst.destroy();chartInst=null;}
+  const ctx=document.getElementById('mChart')?.getContext('2d');
+  if(!ctx)return;
+  chartInst=new Chart(ctx,{type:'bar',data:{labels:rows.map(r=>r.week_start||r.range),datasets:[
+    {label:'Client Hrs',data:rows.map(r=>fmt(r.client_hours)),backgroundColor:'#1aa382',borderRadius:4},
+    {label:'PTO+Holiday',data:rows.map(r=>fmt(r.pto_hours)+fmt(r.holiday_hours)),backgroundColor:'#fbbf24',borderRadius:4},
+    {label:'Expected',data:rows.map(r=>fmt(r.expected_hours)),type:'line',borderColor:'#94a3b8',pointBackgroundColor:'#94a3b8',borderDash:[4,3],fill:false,tension:.3,pointRadius:4},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f1f5f9'}}}}});
+}
+
+function setView(v,btn){
+  currentView=v;
+  document.querySelectorAll('.vb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(window._viewingName) buildWeeklyTable(window._viewingName);
+}
+
+function setPeriod(v){
+  currentPeriod=v;
+  loadData(v); // reload all stats for selected quarter
+}
+
+function switchTab(id){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+id));
+}
+</script>
+<script>
+
+const DEMO_DATA = [
+  {name:'Amanda Martini',discipline:'OT',team:'OT',level:'Lead Clinician',current_quarter:'Q1',year:2026,weekly_hrs_exp:10,qche_100:117,client_hours:144.25,qcompleted:155.75,qche_pct:123.29,pct_remaining:-23.29,tier_status:'Tier 2',estimated_bonus:992,weeks_remaining:0,last_updated:'03/31/2026'},
+  {name:'Brittney Nelson',discipline:'COTA',team:'OT',level:'Coastal FT',current_quarter:'Q1',year:2026,weekly_hrs_exp:20,qche_100:234,client_hours:195,qcompleted:204,qche_pct:83.3,pct_remaining:16.7,tier_status:'Below Minimum',estimated_bonus:0,weeks_remaining:0,last_updated:'03/31/2026'},
+  {name:'Jordan Goddard',discipline:'COTA',team:'OT',level:'Coastal FT',current_quarter:'Q1',year:2026,weekly_hrs_exp:20,qche_100:234,client_hours:220,qcompleted:228,qche_pct:94.0,pct_remaining:6.0,tier_status:'Below Minimum',estimated_bonus:0,weeks_remaining:0,last_updated:'03/31/2026'},
+  {name:'Leslie Talarico',discipline:'COTA',team:'OT',level:'60-day Period',current_quarter:'Q1',year:2026,weekly_hrs_exp:0,qche_100:0,client_hours:15,qcompleted:15,qche_pct:0,pct_remaining:100,tier_status:'N/A',estimated_bonus:0,weeks_remaining:0,last_updated:'03/31/2026'},
+  {name:'Claire Leake',discipline:'SLP',team:'Speech',level:'Lead Clinician',current_quarter:'Q1',year:2026,weekly_hrs_exp:9,qche_100:105,client_hours:98,qcompleted:105,qche_pct:93.3,pct_remaining:6.7,tier_status:'Below Minimum',estimated_bonus:0,weeks_remaining:0,last_updated:'03/30/2026'},
+  {name:'Callye Hansen',discipline:'SLP',team:'Speech',level:'Clackamas',current_quarter:'Q1',year:2026,weekly_hrs_exp:22,qche_100:246,client_hours:238,qcompleted:245,qche_pct:96.7,pct_remaining:3.3,tier_status:'Tier 1',estimated_bonus:60,weeks_remaining:0,last_updated:'03/30/2026'},
+  {name:'Bethany Laratta',discipline:'SLP',team:'Speech',level:'Willamette',current_quarter:'Q2',year:2026,weekly_hrs_exp:24,qche_100:263,client_hours:72,qcompleted:78,qche_pct:27.4,pct_remaining:72.6,tier_status:'Below Minimum',estimated_bonus:0,weeks_remaining:10,last_updated:'04/07/2026'},
+  {name:'Jordyn Hemenway',discipline:'SLP',team:'Speech',level:'Clackamas',current_quarter:'Q1',year:2026,weekly_hrs_exp:22,qche_100:246,client_hours:210,qcompleted:218,qche_pct:85.4,pct_remaining:14.6,tier_status:'Below Minimum',estimated_bonus:0,weeks_remaining:0,last_updated:'03/30/2026'},
+  {name:'Briana Moroney',discipline:'SLP',team:'Speech',level:'Hood',current_quarter:'Q1',year:2026,weekly_hrs_exp:27,qche_100:304,client_hours:298,qcompleted:305,qche_pct:98.0,pct_remaining:2.0,tier_status:'Tier 1',estimated_bonus:90,weeks_remaining:0,last_updated:'03/30/2026'},
+  {name:'Sarah Curl',discipline:'SLP',team:'Speech',level:'Coastal PT',current_quarter:'Q1',year:2026,weekly_hrs_exp:11,qche_100:0,client_hours:48,qcompleted:50,qche_pct:100,pct_remaining:0,tier_status:'Minimum Met',estimated_bonus:0,weeks_remaining:0,last_updated:'03/30/2026'},
+  {name:'Cherie Swain',discipline:'SLP',team:'Speech',level:'Coastal FT',current_quarter:'Q1',year:2026,weekly_hrs_exp:20,qche_100:234,client_hours:200,qcompleted:208,qche_pct:85.5,pct_remaining:14.5,tier_status:'Below Minimum',estimated_bonus:0,weeks_remaining:0,last_updated:'03/30/2026'},
+  {name:'Alyssa Angueira',discipline:'SLP-A',team:'Speech',level:'Willamette',current_quarter:'Q1',year:2026,weekly_hrs_exp:24,qche_100:263,client_hours:255,qcompleted:262,qche_pct:97.0,pct_remaining:3.0,tier_status:'Tier 1',estimated_bonus:30,weeks_remaining:0,last_updated:'03/30/2026'},
+];
+const ALLOWED_CLINICIANS = ['Bethany Laratta'];
+const MY_NAME = 'Bethany Laratta';
+
+async function onDataLoaded() {
+  const cData = summaryData.find(c=>c.name===MY_NAME);
+  window._cs = cData;
+  window._viewingName = MY_NAME;
+  document.getElementById('myStatsArea').innerHTML = buildStatsHTML(cData, MY_NAME);
+  recalc();
+  // Load weekly data and build alert card
+  const {quarter,year} = pq(currentPeriod);
+  const detail = await loadDetail(MY_NAME, quarter, year);
+  const weeklyRows = detail?.weekly || [];
+  const alertWrap = document.getElementById('alertCardWrap');
+  if(alertWrap) alertWrap.innerHTML = buildAlertCard(cData, weeklyRows);
+  buildWeeklyTable(MY_NAME);
+}
+
+window._onPeriodChange = function(v) {
+  const cData = summaryData.find(c=>c.name===MY_NAME);
+  window._cs = cData;
+  document.getElementById('myStatsArea').innerHTML = buildStatsHTML(cData, MY_NAME);
+  recalc();
+  const {quarter,year} = pq(v);
+  buildWeeklyTable(MY_NAME);
+  loadDetail(MY_NAME, quarter, year).then(detail => {
+    const alertWrap = document.getElementById('alertCardWrap');
+    if(alertWrap) alertWrap.innerHTML = buildAlertCard(cData, detail?.weekly||[]);
+  }).catch(() => {});
+};
+
+document.addEventListener('DOMContentLoaded', () => { switchTab('my-stats'); loadData(); });
+
+// ── ALERT CARD ──
+function buildAlertCard(cData, weeklyRows) {
+  if (!cData) return '';
+
+  const weeklyExp = parseFloat(cData.weekly_hrs_exp) || 0;
+  const clientHrs = parseFloat(cData.client_hours) || 0;
+  const qchePct   = parseFloat(cData.qche_pct) || 0;
+  const weeksLeft = parseFloat(cData.weeks_remaining) || 0;
+  const qche      = parseFloat(cData.qche_100) || 0;
+  const quarter   = (cData.current_quarter || 'Q1') + ' ' + (cData.year || 2026);
+
+  // Check if most recent week missed target
+  let missedWeekly = false, missedMonthly = false, missedHrs = 0;
+
+  if (weeklyRows && weeklyRows.length > 0) {
+    const lastWeek = weeklyRows[weeklyRows.length - 1];
+    const lastWeekHrs = parseFloat(lastWeek.client_hours) || 0;
+    missedWeekly = lastWeekHrs < weeklyExp * 0.9; // within 10% is ok
+    missedHrs = parseFloat((weeklyExp - lastWeekHrs).toFixed(2));
+
+    // Check monthly — last 4 weeks average
+    const last4 = weeklyRows.slice(-4);
+    const avg4 = last4.reduce((s,r) => s + (parseFloat(r.client_hours)||0), 0) / last4.length;
+    missedMonthly = avg4 < weeklyExp * 0.85;
+  }
+
+  // Also trigger if QCHE % is below 80% and less than 4 weeks remaining
+  const behindOnQCHE = qchePct < 80; // Test page — always show if below 80%
+
+  if (!missedWeekly && !missedMonthly && !behindOnQCHE) return '';
+
+  const isUrgent = behindOnQCHE || (missedWeekly && missedMonthly);
+  const missedType = missedWeekly ? 'weekly' : 'monthly';
+
+  let triggerText = '';
+  if (behindOnQCHE) triggerText = `⚠️ You are at ${qchePct.toFixed(1)}% QCHE with only ${weeksLeft} weeks left.`;
+  else if (missedWeekly) triggerText = `📉 Last week you were ${missedHrs} hrs below your ${weeklyExp} hr weekly target.`;
+  else if (missedMonthly) triggerText = `📉 Your 4-week average is below your ${weeklyExp} hr/week target.`;
+
+  return `
+    <div class="alert-card ${isUrgent ? 'danger' : ''}" id="alertCard">
+      <div class="alert-header">
+        <span class="alert-icon">${isUrgent ? '🔴' : '⚠️'}</span>
+        <div>
+          <div class="alert-title">${isUrgent ? 'Falling behind — your lead can help' : 'You missed your target this period'}</div>
+          <div class="alert-sub">${triggerText}</div>
+        </div>
+      </div>
+      <div class="alert-stats">
+        <div class="alert-stat"><div class="alert-stat-val">${clientHrs}</div><div class="alert-stat-lbl">Client Hrs</div></div>
+        <div class="alert-stat"><div class="alert-stat-val">${qchePct.toFixed(1)}%</div><div class="alert-stat-lbl">QCHE %</div></div>
+        <div class="alert-stat"><div class="alert-stat-val">${weeksLeft}</div><div class="alert-stat-lbl">Wks Left</div></div>
+        <div class="alert-stat"><div class="alert-stat-val">${weeklyExp}</div><div class="alert-stat-lbl">Wkly Target</div></div>
+      </div>
+      <div class="alert-btns">
+        <button class="alert-btn-pto" onclick="sendPTOAlert('${quarter}','${missedType}',${clientHrs},${qchePct},${weeksLeft},${weeklyExp})">
+          📅 I'm planning PTO
+        </button>
+        <button class="alert-btn-help" onclick="toggleHelpForm()">
+          🙋 I need help
+        </button>
+      </div>
+      <div class="alert-details" id="helpForm">
+        <textarea id="helpDetails" placeholder="Tell your lead what's going on — e.g. 'I had a lot of cancellations this week and I'm not sure how to catch up. Can we talk through my schedule?'"></textarea>
+        <button class="alert-send-btn" id="helpSendBtn" onclick="sendHelpAlert('${quarter}','${missedType}',${clientHrs},${qchePct},${weeksLeft},${weeklyExp})">
+          Send to Claire &amp; HR →
+        </button>
+      </div>
+      <div class="alert-sent" id="alertSent"></div>
+    </div>`;
+}
+
+function toggleHelpForm() {
+  const form = document.getElementById('helpForm');
+  if (form) {
+    form.classList.toggle('open');
+    if (form.classList.contains('open')) {
+      document.getElementById('helpDetails')?.focus();
+    }
+  }
+}
+
+async function sendPTOAlert(quarter, missedType, clientHrs, qchePct, weeksLeft, weeklyExp) {
+  const sentEl = document.getElementById('alertSent');
+  try {
+    const url = (typeof SLACK_URL !== 'undefined' ? SLACK_URL : WEB_APP_URL) + '?action=slackAlert' +
+      '&clinician=' + encodeURIComponent(MY_NAME) +
+      '&msgType=pto' +
+      '&quarter=' + encodeURIComponent(quarter) +
+      '&missedType=' + encodeURIComponent(missedType) +
+      '&clientHrs=' + clientHrs +
+      '&qchePct=' + qchePct +
+      '&weeksLeft=' + weeksLeft +
+      '&weeklyExp=' + weeklyExp +
+      '&details=';
+    await fetch(url);
+    if (sentEl) { 
+      sentEl.className = 'alert-sent show'; 
+      sentEl.innerHTML = '✅ Your lead and HR have been notified you are planning PTO.<br><strong>⚠️ Do not forget — you still need to submit your PTO request in Gusto!</strong>'; 
+    }
+  } catch(e) {
+    if (sentEl) { sentEl.className = 'alert-sent show'; sentEl.textContent = '❌ Error sending — try again.'; }
+  }
+}
+
+async function sendHelpAlert(quarter, missedType, clientHrs, qchePct, weeksLeft, weeklyExp) {
+  const details = document.getElementById('helpDetails')?.value || '';
+  const btn = document.getElementById('helpSendBtn');
+  const sentEl = document.getElementById('alertSent');
+
+  if (!details.trim()) {
+    document.getElementById('helpDetails').style.borderColor = 'var(--r500)';
+    return;
+  }
+
+  if (btn) btn.disabled = true;
+  try {
+    const url = (typeof SLACK_URL !== 'undefined' ? SLACK_URL : WEB_APP_URL) + '?action=slackAlert' +
+      '&clinician=' + encodeURIComponent(MY_NAME) +
+      '&msgType=help' +
+      '&quarter=' + encodeURIComponent(quarter) +
+      '&missedType=' + encodeURIComponent(missedType) +
+      '&clientHrs=' + clientHrs +
+      '&qchePct=' + qchePct +
+      '&weeksLeft=' + weeksLeft +
+      '&weeklyExp=' + weeklyExp +
+      '&details=' + encodeURIComponent(details);
+    await fetch(url);
+    if (sentEl) { sentEl.className = 'alert-sent show'; sentEl.textContent = '✅ Message sent to your lead and Alayna!'; }
+    document.getElementById('helpForm').classList.remove('open');
+  } catch(e) {
+    if (sentEl) { sentEl.className = 'alert-sent show'; sentEl.textContent = '❌ Error sending — try again.'; }
+  }
+  if (btn) btn.disabled = false;
+}
+
+</script>
+</body>
+</html>
