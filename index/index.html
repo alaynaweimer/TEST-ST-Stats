@@ -785,7 +785,7 @@ async function sendPTOAlert(quarter, missedType, clientHrs, qchePct, weeksLeft, 
     await fetch(url);
     if (sentEl) { 
       sentEl.className = 'alert-sent show'; 
-      sentEl.innerHTML = '✅ Your lead and HR have been notified you are planning PTO.<br><strong>⚠️ Don't forget — you still need to submit your PTO request in Gusto!</strong>'; 
+      sentEl.innerHTML = '✅ Your lead and HR have been notified you are planning PTO.<br><strong>⚠️ Do not forget — you still need to submit your PTO request in Gusto!</strong>'; 
     }
   } catch(e) {
     if (sentEl) { sentEl.className = 'alert-sent show'; sentEl.textContent = '❌ Error sending — try again.'; }
